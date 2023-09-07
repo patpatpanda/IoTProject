@@ -17,6 +17,7 @@ namespace AdvancedDevice.DeviceManager
 
 		public string DeviceId { get; set; } = null!;
 		public string ConnectionString { get; private set; } = null!;
+		public string Color { get; set; }
 		public DeviceClient DeviceClient { get; set; } = null!;
 
 		
