@@ -30,14 +30,14 @@ namespace AdvancedDevice.Services
 
 
 
-		public static async Task UpdateReportedTwinAsync(DeviceClient deviceClient,string key, object value)
+		public static async Task UpdateReportedTwinAsync(DeviceClient deviceClient, string key, object value)
 		{
 			try
 			{
 				var twinProps = new TwinCollection();
 				twinProps[key] = value;
 				await deviceClient.UpdateReportedPropertiesAsync(twinProps);
-				//Console.WriteLine($"Reported property: {key} updated with value: {value}");
+				Console.WriteLine($"Reported property: {key} updated with value: {value}");
 			}
 			catch (Exception e)
 			{
@@ -45,6 +45,8 @@ namespace AdvancedDevice.Services
 				throw;
 			}
 		}
-		
+
 	}
+
+
 }

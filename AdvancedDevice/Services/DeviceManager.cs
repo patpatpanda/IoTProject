@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AdvancedDevice.Services;
 using Microsoft.Azure.Devices.Shared;
+using AdvancedDevice.Data;
 
 namespace AdvancedDevice.DeviceManager
 {
@@ -15,38 +16,66 @@ namespace AdvancedDevice.DeviceManager
 	{
 		public DeviceConfig Configuration { get; set; }
 		private LampService _lampService = new LampService();
-		
+
+		private DeviceClient deviceClient;
+
 		public DeviceManager(string connectionString)
 		{
 			Configuration = new DeviceConfig(connectionString);
 			Configuration.DeviceClient.SetMethodDefaultHandlerAsync(DirectMethodCallback, null).Wait();
+			InitializeIoTDevice();
 		}
 
-		public async void StartAsync()
-		{
-			
-		}
-		
+
+
 
 		public void Start()
 		{
 
-			
-			Task.WhenAll(NetworkManager.CheckConnectivityAsync(),
+
+
+
+			Task.WhenAll(
 				SetTelemetryIntervalAsync()
 				,
 				SendTelemetryAsync());
+				
 
 			ListenForUserInput();
 			
 		}
 
-	  public	async Task Twin()
+		private async void InitializeIoTDevice()
 		{
-			
+			try
+			{
+				string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;DeviceId=red;SharedAccessKey=Fu2Rgn+gGg3aNZoiFBhztVPtotfbxeifAR/Dmi4ZBhw=";
+				deviceClient = DeviceClient.CreateFromConnectionString(iotHubConnectionString);
+
+				// Kontrollera om enheten redan är registrerad
+				var deviceTwin = await deviceClient.GetTwinAsync();
+				if (!deviceTwin.Properties.Reported.Contains("deviceId"))
+				{
+					// Enheten är inte registrerad. Registrera den och spara anslutningsinformationen lokalt.
+					string deviceId = Guid.NewGuid().ToString();
+					var twinProps = new TwinCollection();
+					twinProps["deviceId"] = deviceId;
+					await deviceClient.UpdateReportedPropertiesAsync(twinProps);
+					Console.WriteLine($"Device registered with ID: {deviceId}");
+				}
+				else
+				{
+					string deviceId = deviceTwin.Properties.Reported["deviceId"].ToString();
+					Console.WriteLine($"Device already registered with ID: {deviceId}");
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine($"Error checking device registration: {e.Message}");
+			}
 		}
 
-		private async Task SetTelemetryIntervalAsync()
+		public async Task SetTelemetryIntervalAsync()
 		{
 			var _telemetryInterval = await DeviceTwinManager
 				.GetDesiredTwiPropnAsync(Configuration.DeviceClient, "telemetryInterval");
@@ -62,32 +91,34 @@ namespace AdvancedDevice.DeviceManager
 
 		private async Task SendTelemetryAsync()
 		{
-		
 			while (true)
 			{
-				
-				// Check the lamp state and include it in telemetry data
-				bool lampState = _lampService.IsOn();
-
 				if (Configuration.AllowSending)
 				{
-					var data = new LampService()
-					{
-						DeviceName = "Mr Lampa",
-						Created = DateTime.Now,
-						DeviceColor = "Yellow",
-						
-						
-					};
-					
-					var json = JsonConvert.SerializeObject(data);
-					await SendDataAsync(json);
-					await Task.Delay(Configuration.TelemetryInterval);
+					// Check the lamp state and include it in telemetry data
+					bool lampState = _lampService.IsOn();
 
-					
+					string lampMessage = lampState ? "The lamp is on." : "The lamp is off.";
+
+					var telemetryData = new
+					{
+						
+						Date = DateTime.Now,
+						
+						
+						Message = lampMessage, // Include the message
+						// Add other telemetry data points as needed
+					};
+
+					var telemetryJson = JsonConvert.SerializeObject(telemetryData);
+
+					await SendDataAsync(telemetryJson);
 				}
+
+				await Task.Delay(Configuration.TelemetryInterval);
 			}
 		}
+
 
 		public async Task SendDataAsync(string dataAsJson)
 		{

@@ -17,12 +17,12 @@ namespace AdvancedDevice.DeviceManager
 
 		public string DeviceId { get; set; } = null!;
 		public string ConnectionString { get; private set; } = null!;
-		public string Color { get; set; }
+		
 		public DeviceClient DeviceClient { get; set; } = null!;
 
 		
 		
-		public int TelemetryInterval { get; set; } = 100000;
+		public int TelemetryInterval { get; set; } = 10000;
 		public bool AllowSending { get; set; } = true;
 
 		

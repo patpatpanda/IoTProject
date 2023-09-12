@@ -1,26 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AzureFunctionRed.Migrations
+namespace AdvancedDevice.Migrations
 {
     /// <inheritdoc />
-    public partial class asdsa : Migration
+    public partial class hejos : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "LampModels",
+                name: "LampServices",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     DeviceName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DeviceColor = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    DeviceColor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LampModels", x => x.Id);
+                    table.PrimaryKey("PK_LampServices", x => x.Id);
                 });
         }
 
@@ -28,7 +31,7 @@ namespace AzureFunctionRed.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "LampModels");
+                name: "LampServices");
         }
     }
 }

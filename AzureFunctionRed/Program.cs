@@ -10,9 +10,9 @@ var host = new HostBuilder()
 	.ConfigureAppConfiguration(config => config.AddJsonFile("local.settings.json"))
 	.ConfigureServices((builder, services) =>
 	{
-		services.AddDbContext<AzureDbContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("Sql")));
+		services.AddDbContext<AzureDbContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnectionString")));
 		
-		services.AddScoped<LampModel>();
+		
 	})
 	.Build();
 

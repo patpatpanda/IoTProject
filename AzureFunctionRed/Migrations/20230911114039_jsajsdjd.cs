@@ -5,7 +5,7 @@
 namespace AzureFunctionRed.Migrations
 {
     /// <inheritdoc />
-    public partial class sadas : Migration
+    public partial class jsajsdjd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

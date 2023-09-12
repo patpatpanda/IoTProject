@@ -27,7 +27,7 @@ namespace AzureFunctionRed.Data
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<AzureDbContext>();
 			optionsBuilder.UseSqlServer(
-				"Server=tcp:azuremrred.database.windows.net,1433;Initial Catalog=AzureLamp;Persist Security Info=False;User ID=MrAdmin;Password={Hejsan123!};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+				"Server=localhost;Database=Karlsson; TrustServerCertificate=true; Trusted_Connection=True;MultipleActiveResultSets=true");
 
 			return new AzureDbContext(optionsBuilder.Options);
 		}

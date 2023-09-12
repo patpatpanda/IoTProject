@@ -8,32 +8,26 @@ namespace AdvancedDevice.Services
 {
 	public class LampService
 	{
-		
-		private bool isOn;
-		public string DeviceName { get; set; } = null!;
-		public string DeviceColor { get; set; } = null!;
-		public DateTime Created { get; set; }
-
-
-
-
-		public LampService()
-		{
-			isOn = false; // Lamp is initially off
-		}
+		private bool isOn = false; // La
 
 		public void TurnOn()
 		{
-			Console.Clear();
-			isOn = true;
-			Console.WriteLine("Lamp is now on.");
+			if (!isOn)
+			{
+				isOn = true;
+				Console.Clear();
+				Console.WriteLine("Lamp is now on.");
+			}
 		}
 
 		public void TurnOff()
 		{
-			Console.Clear();
-			isOn = false;
-			Console.WriteLine("Lamp is now off.");
+			if (isOn)
+			{
+				isOn = false;
+				Console.Clear();
+				Console.WriteLine("Lamp is now off.");
+			}
 		}
 
 		public bool IsOn()
@@ -41,4 +35,5 @@ namespace AdvancedDevice.Services
 			return isOn;
 		}
 	}
+
 }
