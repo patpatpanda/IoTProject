@@ -36,7 +36,15 @@ namespace AzureFunctionRed
 				
 				var parsedData = ParseEventData(data);
 				_logger.LogInformation("Event Body: {body}", data);
-				
+
+				parsedData = new ParseData()
+				{
+					Id = parsedData.Id,
+					Date = parsedData.Date,
+					DeviceMessage = parsedData.DeviceMessage
+
+				};
+				int lol = 1;
 				SaveDataToLocalDatabase(parsedData);
 			}
 		}

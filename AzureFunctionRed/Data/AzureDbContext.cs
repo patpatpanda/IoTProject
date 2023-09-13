@@ -17,8 +17,7 @@ namespace AzureFunctionRed.Data
 		{
 
 		}
-		public DbSet<LampModel> LampModels { get; set; }
-		public DbSet<Message> Messages { get; set; }
+		
 		public DbSet<ParseData> ParseDatas { get; set; }
 		
 		

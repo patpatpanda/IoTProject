@@ -8,7 +8,7 @@ namespace AdvancedDevice.Services
 {
 	public class LampService
 	{
-		private bool isOn = false; // La
+		private bool isOn;
 
 		public void TurnOn()
 		{

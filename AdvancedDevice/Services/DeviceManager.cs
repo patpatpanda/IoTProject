@@ -16,14 +16,15 @@ namespace AdvancedDevice.DeviceManager
 	internal class DeviceManager 
 	{
 		public DeviceConfig Configuration { get; set; }
-		private LampService _lampService = new LampService();
+		private LampService _lampService;
 
 		private DeviceClient deviceClient;
-		private AppDbContext _appDbContext = new AppDbContext();
+		private AppDbContext _appDbContext;
 
-
-		public DeviceManager(string connectionString)
+		public DeviceManager(string connectionString, AppDbContext appDbContext, LampService lampService)
 		{
+			_appDbContext = appDbContext;
+			_lampService = lampService;
 			Configuration = new DeviceConfig(connectionString);
 			Configuration.DeviceClient.SetMethodDefaultHandlerAsync(DirectMethodCallback, null).Wait();
 			InitializeIoTDevice();
@@ -109,8 +110,8 @@ namespace AdvancedDevice.DeviceManager
 						Date = DateTime.Now,
 						
 						
-						DeviceMessage  = lampMessage, // Include the message
-						// Add other telemetry data points as needed
+						DeviceMessage  = lampMessage, 
+						
 					};
 
 					var telemetryJson = JsonConvert.SerializeObject(telemetryData);
