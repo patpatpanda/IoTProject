@@ -19,17 +19,17 @@ namespace AdvancedDevice.DeviceManager
 		private LampService _lampService;
 
 		private DeviceClient deviceClient;
-		private AppDbContext _appDbContext;
+	
 
-		public DeviceManager(string connectionString, AppDbContext appDbContext, LampService lampService)
+		public DeviceManager(string connectionString,  LampService lampService)
 		{
-			_appDbContext = appDbContext;
+			
 			_lampService = lampService;
 			Configuration = new DeviceConfig(connectionString);
 			Configuration.DeviceClient.SetMethodDefaultHandlerAsync(DirectMethodCallback, null).Wait();
 			InitializeIoTDevice();
 		}
-
+		
 
 
 
@@ -43,6 +43,7 @@ namespace AdvancedDevice.DeviceManager
 				SetTelemetryIntervalAsync()
 				,
 				SendTelemetryAsync());
+				
 				
 
 			ListenForUserInput();
@@ -117,8 +118,7 @@ namespace AdvancedDevice.DeviceManager
 					var telemetryJson = JsonConvert.SerializeObject(telemetryData);
 
 					await SendDataAsync(telemetryJson);
-					_appDbContext.DeviceInfos.Add(telemetryData);
-					_appDbContext.SaveChanges();
+					
 				}
 
 				await Task.Delay(Configuration.TelemetryInterval);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AdvancedDevice.Services
 {
-	internal class NetworkManager
+	public class NetworkManager
 	{
 		private static readonly Ping ping = new();
 		public static bool isConnected = false;

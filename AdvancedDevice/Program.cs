@@ -8,12 +8,12 @@ using System.Net;using Microsoft.Azure.Devices;
 
 
 var lampService = new LampService();
-var db = new AppDbContext();
+
 
 
 var device =
 	new DeviceManager(
-		"HostName=iot-warrior.azure-devices.net;DeviceId=red;SharedAccessKey=Fu2Rgn+gGg3aNZoiFBhztVPtotfbxeifAR/Dmi4ZBhw=",db,lampService);
+		"HostName=iot-warrior.azure-devices.net;DeviceId=red;SharedAccessKey=Fu2Rgn+gGg3aNZoiFBhztVPtotfbxeifAR/Dmi4ZBhw=",lampService);
 
 
 
