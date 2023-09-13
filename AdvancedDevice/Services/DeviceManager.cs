@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AdvancedDevice.Services;
 using Microsoft.Azure.Devices.Shared;
 using AdvancedDevice.Data;
+using AdvancedDevice.Models;
 
 namespace AdvancedDevice.DeviceManager
 {
@@ -18,6 +19,8 @@ namespace AdvancedDevice.DeviceManager
 		private LampService _lampService = new LampService();
 
 		private DeviceClient deviceClient;
+		private AppDbContext _appDbContext = new AppDbContext();
+
 
 		public DeviceManager(string connectionString)
 		{
@@ -100,19 +103,21 @@ namespace AdvancedDevice.DeviceManager
 
 					string lampMessage = lampState ? "The lamp is on." : "The lamp is off.";
 
-					var telemetryData = new
+					var telemetryData = new DeviceInfo()
 					{
 						
 						Date = DateTime.Now,
 						
 						
-						Message = lampMessage, // Include the message
+						DeviceMessage  = lampMessage, // Include the message
 						// Add other telemetry data points as needed
 					};
 
 					var telemetryJson = JsonConvert.SerializeObject(telemetryData);
 
 					await SendDataAsync(telemetryJson);
+					_appDbContext.DeviceInfos.Add(telemetryData);
+					_appDbContext.SaveChanges();
 				}
 
 				await Task.Delay(Configuration.TelemetryInterval);

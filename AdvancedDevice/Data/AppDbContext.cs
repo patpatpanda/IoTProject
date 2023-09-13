@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AdvancedDevice.Models;
 using AdvancedDevice.Services;
 
 namespace AdvancedDevice.Data
@@ -12,7 +13,7 @@ namespace AdvancedDevice.Data
 	public class AppDbContext : DbContext
 	{
 		
-		public DbSet<LampService> LampServices { get; set; }
+		public DbSet<DeviceInfo> DeviceInfos { get; set; }
 
 		public AppDbContext()
 		{

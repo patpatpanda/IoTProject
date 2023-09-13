@@ -33,18 +33,18 @@ namespace AzureFunctionRed
 			{
 				var data = Encoding.UTF8.GetString(@event.Body.ToArray());
 
-				// Parse the data as needed
+				
 				var parsedData = ParseEventData(data);
 				_logger.LogInformation("Event Body: {body}", data);
-				// Save the parsed data to the local database
-				//SaveDataToLocalDatabase(parsedData);
+				
+				SaveDataToLocalDatabase(parsedData);
 			}
 		}
 
 		private void SaveDataToLocalDatabase(ParseData parsedData)
 		{
 			
-				// Use Entity Framework or your preferred database access method to save data
+				
 				_db.ParseDatas.Add(parsedData);
 				_db.SaveChanges();
 			
@@ -56,18 +56,17 @@ namespace AzureFunctionRed
 		{
 			try
 			{
-				// Assuming eventData is a JSON string, you can use Newtonsoft.Json to deserialize it
 				var parsedData = JsonConvert.DeserializeObject<ParseData>(eventData);
 
-				// If the structure of eventData matches the ParsedData class, you can directly deserialize it
+				
 				return parsedData;
 			}
 			catch (JsonException ex)
 			{
-				// Handle JSON parsing errors here, e.g., log the error
+				
 				_logger.LogError("Error parsing JSON data: {ex.Message}");
 
-				// Return null or an appropriate default value in case of parsing failure
+				
 				return null;
 			}
 		}
