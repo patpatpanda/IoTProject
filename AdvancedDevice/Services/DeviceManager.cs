@@ -44,10 +44,12 @@ namespace AdvancedDevice.DeviceManager
 				,
 				SendTelemetryAsync());
 				
-				
+			
+
 
 			ListenForUserInput();
-			
+
+
 		}
 
 		private async void InitializeIoTDevice()
@@ -57,11 +59,11 @@ namespace AdvancedDevice.DeviceManager
 				string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;DeviceId=red;SharedAccessKey=Fu2Rgn+gGg3aNZoiFBhztVPtotfbxeifAR/Dmi4ZBhw=";
 				deviceClient = DeviceClient.CreateFromConnectionString(iotHubConnectionString);
 
-				// Kontrollera om enheten redan är registrerad
+				
 				var deviceTwin = await deviceClient.GetTwinAsync();
 				if (!deviceTwin.Properties.Reported.Contains("deviceId"))
 				{
-					// Enheten är inte registrerad. Registrera den och spara anslutningsinformationen lokalt.
+					
 					string deviceId = Guid.NewGuid().ToString();
 					var twinProps = new TwinCollection();
 					twinProps["deviceId"] = deviceId;
@@ -103,7 +105,7 @@ namespace AdvancedDevice.DeviceManager
 					// Check the lamp state and include it in telemetry data
 					bool lampState = _lampService.IsOn();
 
-					string lampMessage = lampState ? "The lamp is on." : "The lamp is off.";
+					string lampMessage = lampState ? "The lamp is on" : "The lamp is off";
 
 					var telemetryData = new DeviceInfo()
 					{
@@ -124,6 +126,36 @@ namespace AdvancedDevice.DeviceManager
 				await Task.Delay(Configuration.TelemetryInterval);
 			}
 		}
+
+
+		private async Task SendLampStatusAsync()
+		{
+			while (true)
+			{
+				if (Configuration.AllowSending)
+				{
+					// Check the lamp state
+					bool lampState = _lampService.IsOn();
+
+					// Create a message to represent the lamp status
+					var lampStatusMessage = new LampStatusMessage()
+					{
+						Date = DateTime.Now,
+						IsOn = lampState
+					};
+
+					// Serialize the message to JSON
+					var lampStatusJson = JsonConvert.SerializeObject(lampStatusMessage);
+
+					// Send the lamp status data
+					await SendDataAsync(lampStatusJson);
+				}
+
+				await Task.Delay(Configuration.TelemetryInterval);
+			}
+		}
+
+
 
 
 		public async Task SendDataAsync(string dataAsJson)

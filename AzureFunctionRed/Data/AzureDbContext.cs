@@ -20,10 +20,11 @@ namespace AzureFunctionRed.Data
 		
 		public DbSet<ParseData> ParseDatas { get; set; }
 		
-		
+		public DbSet<DeviceStatus> DeviceStatusSet { get; set; }
+		public DbSet<DeviceAction> DeviceActions{ get; set; }
 
 
-		
-		
+
+
 	}
 }
