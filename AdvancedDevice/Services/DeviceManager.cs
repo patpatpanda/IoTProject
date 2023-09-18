@@ -28,7 +28,6 @@ namespace AdvancedDevice.DeviceManager
 			Configuration = new DeviceConfig(connectionString);
 			Configuration.DeviceClient.SetMethodDefaultHandlerAsync(DirectMethodCallback, null).Wait();
 			InitializeIoTDevice();
-			
 			Configuration.DeviceClient.SetMethodHandlerAsync("SetTelemetryInterval", SetTelemetryIntervalMethod, null).Wait();
 		}
 
@@ -46,7 +45,6 @@ namespace AdvancedDevice.DeviceManager
 				,
 				SendTelemetryAsync());
 				
-				
 
 
 
@@ -55,6 +53,7 @@ namespace AdvancedDevice.DeviceManager
 
 
 		}
+
 		private async void InitializeIoTDevice()
 		{
 			try
@@ -62,9 +61,12 @@ namespace AdvancedDevice.DeviceManager
 				string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;DeviceId=red;SharedAccessKey=Fu2Rgn+gGg3aNZoiFBhztVPtotfbxeifAR/Dmi4ZBhw=";
 				deviceClient = DeviceClient.CreateFromConnectionString(iotHubConnectionString);
 
+
 				var deviceTwin = await deviceClient.GetTwinAsync();
+
 				if (!deviceTwin.Properties.Reported.Contains("deviceId"))
 				{
+
 					string deviceId = Guid.NewGuid().ToString();
 					var twinProps = new TwinCollection();
 					twinProps["deviceId"] = deviceId;
@@ -75,39 +77,17 @@ namespace AdvancedDevice.DeviceManager
 				{
 					string deviceId = deviceTwin.Properties.Reported["deviceId"].ToString();
 					Console.WriteLine($"Device already registered with ID: {deviceId}");
-					string message = "This is the last message";
-					await InitializeIoTDeviceMessage(message);
+					string latestMessage = "Detta är mitt senaste meddelande";
 
+					// Spara det senaste meddelandet i Device Twin
+					await InitializeIoTDeviceMessage(latestMessage);
 				}
-
-				// Här anropar du InitializeIoTDeviceMessage() för att hantera meddelanden
-			
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine($"Error checking device registration: {e.Message}");
 			}
-		
-	}
-
-		public async Task InitializeIoTDeviceMessage(string message)
-		{
-			try
-			{
-
-				var twinProps = new TwinCollection();
-				twinProps["latestMessage"] = message; 
-				await deviceClient.UpdateReportedPropertiesAsync(twinProps);
-				Console.WriteLine($"Latest message in Device Twin updated: {message}");
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine($"Error updating latest message in Device Twin: {e.Message}");
-			}
 		}
-
-
-
 
 		public async Task SetTelemetryIntervalAsync()
 		{
@@ -120,6 +100,23 @@ namespace AdvancedDevice.DeviceManager
 			await DeviceTwinManager
 				.UpdateReportedTwinAsync(Configuration.DeviceClient, "telemetryInterval", Configuration.TelemetryInterval);
 		}
+		public async Task InitializeIoTDeviceMessage(string message)
+		{
+			try
+			{
+				// Ditt befintliga kod för anslutning och Device Twin-hantering
+
+				var twinProps = new TwinCollection();
+				twinProps["latestMessage"] = message; // Spara det senaste meddelandet här
+				await deviceClient.UpdateReportedPropertiesAsync(twinProps);
+				Console.WriteLine($"Latest message in Device Twin updated: {message}");
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine($"Error updating latest message in Device Twin: {e.Message}");
+			}
+		}
+
 
 		private async Task<MethodResponse> SetTelemetryIntervalMethod(MethodRequest methodRequest, object userContext)
 		{
