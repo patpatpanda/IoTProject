@@ -33,35 +33,32 @@ namespace AzureFunctionRed
 			{
 				var data = Encoding.UTF8.GetString(@event.Body.ToArray());
 
-				
 				var parsedData = ParseDeviceStatus(data);
 				_logger.LogInformation("Event Body: {body}", data);
 
-				parsedData = new DeviceStatus()
+				if (parsedData != null)
 				{
-					Id = parsedData.Id,
-					Date = parsedData.Date,
-					DeviceMessage = parsedData.DeviceMessage
-
-				};
-				SaveDataToLocalDatabase(parsedData);
-
-				
-			
+					SaveDataToLocalDatabase(parsedData);
+				}
+				else
+				{
+					_logger.LogError("Failed to parse data from Event Hub.");
+				}
 			}
 		}
-		
+
+
 
 
 		private void SaveDataToLocalDatabase(DeviceStatus parsedData)
 		{
-			
-				
-				_db.DeviceStatusSet.Add(parsedData);
-				_db.SaveChanges();
-			
-				
-			
+
+
+			_db.DeviceStatusSet.Add(parsedData);
+			_db.SaveChanges();
+
+
+
 		}
 		private void SaveDeviceActionToDatabase(DeviceAction parsedData)
 		{
@@ -119,9 +116,8 @@ namespace AzureFunctionRed
 	}
 
 
-	}
+}
 
 
 
 
-	
