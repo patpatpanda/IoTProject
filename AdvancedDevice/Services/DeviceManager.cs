@@ -266,7 +266,10 @@ namespace AdvancedDevice.DeviceManager
 		{
 			while (true)
 			{
-
+				Console.ForegroundColor = ConsoleColor.Blue;
+				Console.WriteLine("             LAMP DEVICE                 ");
+				Console.ForegroundColor = ConsoleColor.White;
+				Console.WriteLine();
 				Console.WriteLine("-----------------------------------------");
 				Console.WriteLine("-----------------------------------------");
 				Console.WriteLine("║   1 = ON                               ║");
