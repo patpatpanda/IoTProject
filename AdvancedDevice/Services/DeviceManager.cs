@@ -59,10 +59,6 @@ namespace AdvancedDevice.DeviceManager
 		{
 			try
 			{
-				string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;DeviceId=red;SharedAccessKey=Fu2Rgn+gGg3aNZoiFBhztVPtotfbxeifAR/Dmi4ZBhw=";
-				deviceClient = DeviceClient.CreateFromConnectionString(iotHubConnectionString);
-
-			
 				
 					string deviceId = Guid.NewGuid().ToString();
 					var twinProps = new TwinCollection();
