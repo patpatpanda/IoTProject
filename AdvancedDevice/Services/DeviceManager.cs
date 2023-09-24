@@ -73,14 +73,11 @@ namespace AdvancedDevice.DeviceManager
 				}
 				else
 				{
-					string deviceId = deviceTwin.Properties.Reported["deviceId"].ToString();
-					Console.WriteLine($"Device already registered with ID: {deviceId}");
 					string message = "This is the last message";
 					await InitializeIoTDeviceMessage(message);
 
 				}
 
-				// Här anropar du InitializeIoTDeviceMessage() för att hantera meddelanden
 
 			}
 			catch (Exception e)

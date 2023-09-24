@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Common.Exceptions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks; // Added to allow asynchronous methods
 
@@ -8,88 +10,93 @@ using System.Threading.Tasks; // Added to allow asynchronous methods
 [ApiController]
 public class DevicesController : ControllerBase
 {
+	private readonly string iotHubConnectionString =
+		"HostName=iot-warrior.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=fUwugjRnWfRPHa5sB+yBDMO7Oqzg7yku6AIoTKh4Z5Q=";
+
 	[HttpGet("{deviceId}")]
 	public async Task<IActionResult> IsDeviceRegistered(string deviceId)
 	{
-		// Check if the device is registered and return a response
-		string iotHubConnectionString =
-			"HostName=iot-warrior.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=fUwugjRnWfRPHa5sB+yBDMO7Oqzg7yku6AIoTKh4Z5Q=";
-
-		// Initialize the IoT Hub RegistryManager:
-		RegistryManager registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
-
 		try
 		{
-			// Try to retrieve the device by its ID.
+			RegistryManager registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
+
 			Device device = await registryManager.GetDeviceAsync(deviceId);
 
-			// If the device is found, it's registered.
 			bool isRegistered = device != null;
 
 			if (isRegistered)
 			{
-				Console.WriteLine($"Device {deviceId} is registered in Azure IoT Hub.");
-				return Ok(isRegistered); // Return a 200 OK response
+				return Ok(new { IsRegistered = true, Message = $"Device {deviceId} is registered in Azure IoT Hub." });
 			}
 			else
 			{
-				Console.WriteLine($"Device {deviceId} is not registered in Azure IoT Hub.");
-				return NotFound(); // Return a 404 Not Found response
+				return NotFound(new
+					{ IsRegistered = false, Message = $"Device {deviceId} is not registered in Azure IoT Hub." });
 			}
 		}
 		catch (DeviceNotFoundException)
 		{
 			// If DeviceNotFoundException is thrown, the device is not registered.
-			Console.WriteLine($"Device {deviceId} is not registered in Azure IoT Hub.");
-			return NotFound(); // Return a 404 Not Found response
+			return NotFound(new
+				{ IsRegistered = false, Message = $"Device {deviceId} is not registered in Azure IoT Hub." });
 		}
 		catch (Exception ex)
 		{
-			Console.WriteLine($"Error checking device registration: {ex.Message}");
-			return StatusCode(500, $"Internal Server Error: {ex.Message}"); // Return a 500 Internal Server Error response
-		}
-		finally
-		{
-			// Dispose of the RegistryManager when done.
-			await registryManager.CloseAsync();
+			return StatusCode(500, new { IsRegistered = false, ErrorMessage = $"Internal Server Error: {ex.Message}" });
+			string iotHubConnectionString =
+				"HostName=your-iothub.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-shared-access-key";
 		}
 	}
 
-
-	[HttpPost("{deviceId}")]
-	public IActionResult RegisterDevice(string deviceId)
+	[HttpPost("register")]
+	public async Task<IActionResult> RegisterDevice([FromBody] DeviceRegistrationModel registrationModel)
 	{
 		try
 		{
-			// Initialize the Azure IoT Hub service client
-			string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=fUwugjRnWfRPHa5sB+yBDMO7Oqzg7yku6AIoTKh4Z5Q=";
 			RegistryManager registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
 
 			// Check if the device already exists
-			Device existingDevice = registryManager.GetDeviceAsync(deviceId).Result;
+			Device existingDevice = await registryManager.GetDeviceAsync(registrationModel.DeviceId);
 			if (existingDevice != null)
 			{
-				return BadRequest("Device already exists in Azure IoT Hub");
+				return Conflict(new
+				{
+					IsRegistered = true,
+					Message = $"Device {registrationModel.DeviceId} already exists in Azure IoT Hub."
+				});
 			}
 
 			// Create a new device
-			var newDevice = new Device(deviceId);
-			newDevice = registryManager.AddDeviceAsync(newDevice).Result;
+			Device newDevice = new Device(registrationModel.DeviceId);
+			newDevice = await registryManager.AddDeviceAsync(newDevice);
 
-			// Check if the registration was successful
-			if (newDevice != null)
+			return CreatedAtAction(nameof(IsDeviceRegistered), new { deviceId = newDevice.Id }, new
 			{
-				return Ok("Device registered successfully");
-			}
-			else
-			{
-				return BadRequest("Device registration failed");
-			}
+				IsRegistered = true,
+				Message = $"Device {registrationModel.DeviceId} registered successfully in Azure IoT Hub."
+			});
 		}
 		catch (Exception ex)
 		{
-			return StatusCode(500, $"Internal Server Error: {ex.Message}");
+			return StatusCode(500, new
+			{
+				IsRegistered = false,
+				ErrorMessage = $"Internal Server Error: {ex.Message}"
+			});
 		}
 	}
 
+
+
+
+	public class DeviceRegistrationModel
+	{
+		public string DeviceId { get; set; }
+		// Add other properties as needed for device registration
+	}
+
+
 }
+
+
+

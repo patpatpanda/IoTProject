@@ -47,30 +47,7 @@ namespace AdvancedDevice.Services
 		}
 
 
-		private async Task UpdateDeviceIdInReportedProperties(string deviceId)
-		{
-			try
-			{
-				// Create or retrieve the DeviceClient
-				// Replace with your actual connection string
-				string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=fUwugjRnWfRPHa5sB+yBDMO7Oqzg7yku6AIoTKh4Z5Q=";
-				DeviceClient deviceClient = DeviceClient.CreateFromConnectionString(iotHubConnectionString);
-
-				// Get the current device twin
-				var deviceTwin = await deviceClient.GetTwinAsync();
-
-				// Update the deviceId in reported properties
-				var reportedProperties = new TwinCollection();
-				reportedProperties["deviceId"] = "red"; // Replace with the desired deviceId
-				await deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
-
-				Console.WriteLine("DeviceId in reported properties updated to 'red'");
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine($"Error updating reported properties: {ex.Message}");
-			}
-		}
+		
 	}
 
 
