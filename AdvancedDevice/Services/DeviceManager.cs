@@ -62,21 +62,18 @@ namespace AdvancedDevice.DeviceManager
 				string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;DeviceId=red;SharedAccessKey=Fu2Rgn+gGg3aNZoiFBhztVPtotfbxeifAR/Dmi4ZBhw=";
 				deviceClient = DeviceClient.CreateFromConnectionString(iotHubConnectionString);
 
-				var deviceTwin = await deviceClient.GetTwinAsync();
-				if (!deviceTwin.Properties.Reported.Contains("deviceId"))
-				{
+			
+				
 					string deviceId = Guid.NewGuid().ToString();
 					var twinProps = new TwinCollection();
-					twinProps["deviceId"] = deviceId;
-					await deviceClient.UpdateReportedPropertiesAsync(twinProps);
-					Console.WriteLine($"Device registered with ID: {deviceId}");
-				}
-				else
-				{
-					string message = "This is the last message";
+					
+					
+			
+				
+					string message = "This is the last message1337";
 					await InitializeIoTDeviceMessage(message);
 
-				}
+				
 
 
 			}

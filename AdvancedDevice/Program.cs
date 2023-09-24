@@ -115,17 +115,4 @@ static async Task<bool> RegisterDeviceAsync(string deviceId, string iotHubConnec
 
 
 
-public class ErrorResponse
-{
-	public string ErrorMessage { get; set; }
-	// Add any other properties you expect in the error JSON response here
-}
 
-// Handle registration failure and other HTTP errors here
-
-
-public class DeviceRegistrationStatus
-{
-	public bool IsRegistered { get; set; }
-	// Add any other properties you expect in the JSON response here
-}
