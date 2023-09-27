@@ -10,6 +10,9 @@ using AdvancedDevice.Services;
 using Microsoft.Azure.Devices.Shared;
 using AdvancedDevice.Data;
 using AdvancedDevice.Models;
+using Microsoft.Azure.Devices;
+using Microsoft.Azure.Devices.Client.Exceptions;
+using Message = Microsoft.Azure.Devices.Client.Message;
 
 namespace AdvancedDevice.DeviceManager
 {
@@ -29,7 +32,8 @@ namespace AdvancedDevice.DeviceManager
 			Configuration.DeviceClient.SetMethodDefaultHandlerAsync(DirectMethodCallback, null).Wait();
 			InitializeIoTDevice();
 
-			Configuration.DeviceClient.SetMethodHandlerAsync("SetTelemetryInterval", SetTelemetryIntervalMethod, null).Wait();
+			Configuration.DeviceClient.SetMethodHandlerAsync("SetTelemetryInterval", SetTelemetryIntervalMethod, null)
+				.Wait();
 		}
 
 
@@ -37,14 +41,23 @@ namespace AdvancedDevice.DeviceManager
 
 		public void Start()
 		{
+			string deviceId = "Test_Device"; // Replace with the actual device ID you want to check
+			string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=fUwugjRnWfRPHa5sB+yBDMO7Oqzg7yku6AIoTKh4Z5Q=";
+			string apiBaseUrl = "https://deviceapi20230918091812.azurewebsites.net/api/devices";
 
+			
+
+		
+
+				
 
 
 
 			Task.WhenAll(
 				SetTelemetryIntervalAsync()
 				,
-				SendTelemetryAsync());
+				SendTelemetryAsync(), ProcessDeviceRegistration(deviceId, iotHubConnectionString, apiBaseUrl));
+
 
 
 
@@ -55,21 +68,27 @@ namespace AdvancedDevice.DeviceManager
 
 
 		}
+
 		private async void InitializeIoTDevice()
 		{
 			try
 			{
-				
-					string deviceId = Guid.NewGuid().ToString();
-					var twinProps = new TwinCollection();
-					
-					
-			
-				
-					string message = "This is the last message1337";
-					await InitializeIoTDeviceMessage(message);
+				string iotHubConnectionString =
+					"HostName=iot-warrior.azure-devices.net;DeviceId=Lamp_Device;SharedAccessKey=et+aBpSlOWW3gZDIwajcw1HHNbXSo7Ss4Q0EYwe0IK0=";
+				deviceClient = DeviceClient.CreateFromConnectionString(iotHubConnectionString);
 
-				
+
+
+				string deviceId = Guid.NewGuid().ToString();
+				var twinProps = new TwinCollection();
+
+
+
+
+				string message = "This is the last message1337";
+				await InitializeIoTDeviceMessage(message);
+
+
 
 
 			}
@@ -88,7 +107,7 @@ namespace AdvancedDevice.DeviceManager
 				var twinProps = new TwinCollection();
 				twinProps["latestMessage"] = message;
 				await deviceClient.UpdateReportedPropertiesAsync(twinProps);
-				Console.WriteLine($"Latest message in Device Twin updated: {message}");
+				
 			}
 			catch (Exception e)
 			{
@@ -108,7 +127,8 @@ namespace AdvancedDevice.DeviceManager
 				Configuration.TelemetryInterval = int.Parse(_telemetryInterval.ToString()!);
 
 			await DeviceTwinManager
-				.UpdateReportedTwinAsync(Configuration.DeviceClient, "telemetryInterval", Configuration.TelemetryInterval);
+				.UpdateReportedTwinAsync(Configuration.DeviceClient, "telemetryInterval",
+					Configuration.TelemetryInterval);
 		}
 
 		private async Task<MethodResponse> SetTelemetryIntervalMethod(MethodRequest methodRequest, object userContext)
@@ -123,7 +143,8 @@ namespace AdvancedDevice.DeviceManager
 				Configuration.TelemetryInterval = payload.Interval;
 
 				// Uppdatera Device Twin för att reflektera det nya intervallet
-				await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "telemetryInterval", Configuration.TelemetryInterval);
+				await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "telemetryInterval",
+					Configuration.TelemetryInterval);
 
 				var responsePayload = new
 				{
@@ -232,7 +253,8 @@ namespace AdvancedDevice.DeviceManager
 			{
 				case "on":
 					Configuration.AllowSending = true;
-					await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "allowSending", Configuration.AllowSending);
+					await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "allowSending",
+						Configuration.AllowSending);
 
 					// Turn on the lamp simulator
 					_lampService.TurnOn();
@@ -241,7 +263,8 @@ namespace AdvancedDevice.DeviceManager
 
 				case "off":
 					Configuration.AllowSending = false;
-					await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "allowSending", Configuration.AllowSending);
+					await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "allowSending",
+						Configuration.AllowSending);
 
 					// Turn off the lamp simulator
 					_lampService.TurnOff();
@@ -252,6 +275,7 @@ namespace AdvancedDevice.DeviceManager
 					return new MethodResponse(400);
 			}
 		}
+
 		private void ListenForUserInput()
 		{
 			while (true)
@@ -299,6 +323,97 @@ namespace AdvancedDevice.DeviceManager
 			}
 		}
 
+		static async Task<bool> IsDeviceRegisteredAsync(string deviceId, string iotHubConnectionString)
+		{
+			try
+			{
+				RegistryManager registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
 
+				Device device = await registryManager.GetDeviceAsync(deviceId);
+
+				return device != null;
+			}
+			catch (DeviceNotFoundException)
+			{
+				// If DeviceNotFoundException is thrown, the device is not registered.
+				return false;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error checking device registration: {ex.Message}");
+				return false;
+			}
+		}
+
+		async Task ProcessDeviceRegistration(string deviceId, string iotHubConnectionString, string apiBaseUrl)
+		{
+			bool isDeviceRegistered = await IsDeviceRegisteredAsync(deviceId, iotHubConnectionString);
+
+			if (isDeviceRegistered)
+			{
+				Console.WriteLine($"Device {deviceId} is registered in Azure IoT Hub.");
+			}
+			else
+			{
+				Console.WriteLine($"Device {deviceId} is not registered in Azure IoT Hub.");
+
+				// Register the device
+				bool registrationSuccess = await RegisterDeviceAsync(deviceId, iotHubConnectionString, apiBaseUrl);
+
+				if (registrationSuccess)
+				{
+					Console.WriteLine($"Device {deviceId} was registered successfully.");
+					// Save the connection information locally
+					// SaveConnectionInfoLocally(deviceId, iotHubConnectionString);
+				}
+				else
+				{
+					Console.WriteLine($"Device {deviceId} registration failed.");
+				}
+			}
+		}
+
+
+		// ... The rest of your code ...
+
+		static async Task<bool> RegisterDeviceAsync(string deviceId, string iotHubConnectionString, string apiBaseUrl)
+		{
+			try
+			{
+				using (HttpClient httpClient = new HttpClient())
+				{
+					var registrationData = new
+					{
+						DeviceId = deviceId,
+						// Add other properties as needed for device registration
+					};
+
+					var jsonContent = JsonConvert.SerializeObject(registrationData);
+
+					var requestContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+					var response =
+						await httpClient.PostAsync($"{apiBaseUrl}/register",
+							requestContent); // Use the correct API endpoint
+
+					if (response.IsSuccessStatusCode)
+					{
+						return true;
+					}
+					else
+					{
+						Console.WriteLine($"Device registration failed with status code: {response.StatusCode}");
+						return false;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"Error registering device: {ex.Message}");
+				return false;
+			}
+
+
+		}
 	}
 }
