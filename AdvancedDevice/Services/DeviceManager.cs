@@ -206,7 +206,7 @@ namespace AdvancedDevice.DeviceManager
 					// Check the lamp state
 					bool lampState = _lampService.IsOn();
 
-					// Create a message to represent the lamp status
+					
 					var lampStatusMessage = new LampStatusMessage()
 					{
 						Date = DateTime.Now,
