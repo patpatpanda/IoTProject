@@ -27,7 +27,7 @@ namespace AzureFunctionRed.Data
 		{
 			var optionsBuilder = new DbContextOptionsBuilder<AzureDbContext>();
 			optionsBuilder.UseSqlServer(
-				"Server=localhost;Database=Karlsson; TrustServerCertificate=true; Trusted_Connection=True;MultipleActiveResultSets=true");
+				"Server=localhost;Database=AzureFunctionDatabase; TrustServerCertificate=true; Trusted_Connection=True;MultipleActiveResultSets=true");
 
 			return new AzureDbContext(optionsBuilder.Options);
 		}
