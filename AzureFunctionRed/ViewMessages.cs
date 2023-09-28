@@ -64,18 +64,7 @@ namespace AzureFunctionRed
 
 
 		}
-		private void SaveDeviceActionToDatabase(DeviceAction parsedData)
-		{
-
-
-			_db.DeviceActions.Add(parsedData);
-			_db.SaveChanges();
-
-
-
-		}
-
-
+		
 
 		public DeviceStatus ParseDeviceStatus(string eventData)
 		{
@@ -95,27 +84,8 @@ namespace AzureFunctionRed
 				return null;
 			}
 		}
-		public DeviceAction ParseDeviceAction(string eventData)
-		{
-			try
-			{
-				var parsedData = JsonConvert.DeserializeObject<DeviceAction>(eventData);
-
-
-				return parsedData;
-			}
-			catch (JsonException ex)
-			{
-
-				_logger.LogError("Error parsing JSON data: {ex.Message}");
-
-
-				return null;
-			}
-		}
-
-
-
+		
+		
 
 	}
 

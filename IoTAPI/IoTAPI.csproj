@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AdvancedDevice\AdvancedDevice.csproj" />
+    <ProjectReference Include="..\AzureFunctionRed\AzureFunctionRed.csproj" />
   </ItemGroup>
 
 </Project>
