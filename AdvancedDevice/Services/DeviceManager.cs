@@ -301,7 +301,7 @@ namespace AdvancedDevice.DeviceManager
 				{
 					_lampService.TurnOn();
 					// Uppdatera senaste status i Device Twin
-					DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "lampStatus", "On").Wait();
+					DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "lampStatus", "on").Wait();
 
 				}
 				else if (userInput == "2")
@@ -309,7 +309,7 @@ namespace AdvancedDevice.DeviceManager
 
 					_lampService.TurnOff();
 					// Uppdatera senaste status i Device Twin
-					DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "lampStatus", "Off").Wait();
+					DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "lampStatus", "off").Wait();
 
 				}
 				else if (userInput == "3")

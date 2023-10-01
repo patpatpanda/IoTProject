@@ -15,7 +15,7 @@ namespace AzureFunctionRed.Data
 
 		public AzureDbContext(DbContextOptions<AzureDbContext> dbContextOptions) : base(dbContextOptions)
 		{
-
+			
 		}
 		
 		

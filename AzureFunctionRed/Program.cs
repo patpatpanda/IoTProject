@@ -10,9 +10,17 @@ var host = new HostBuilder()
 	.ConfigureAppConfiguration(config => config.AddJsonFile("local.settings.json"))
 	.ConfigureServices((builder, services) =>
 	{
-		services.AddDbContext<AzureDbContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-		
-		
+		services.AddDbContext<AzureDbContext>(options =>
+		{
+			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+		});
+
+		// Hämta ServiceProvider för att få tillgång till DbContext senare
+		var serviceProvider = services.BuildServiceProvider();
+		var dbContext = serviceProvider.GetRequiredService<AzureDbContext>();
+
+		// Skapa databasen om den inte redan existerar
+		dbContext.Database.EnsureCreated();
 	})
 	.Build();
 
