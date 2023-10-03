@@ -2,30 +2,26 @@
 using AdvancedDevice.DeviceManager;
 using AdvancedDevice.Services;
 using Microsoft.Azure.Devices.Client;
-using Microsoft.WindowsAzure.Storage.Table.Protocol;
 using Newtonsoft.Json;
-using System.Net;
-using System.Text;
+using System;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Client.Exceptions;
 
+var configurationBuilder = new ConfigurationBuilder()
+	.SetBasePath(Directory.GetCurrentDirectory())
+	.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+var configuration = configurationBuilder.Build();
+
+
+var iotHubConnectionString = configuration.GetConnectionString("IoTHubConnectionString");
 
 var lampService = new LampService();
 
-
-var device =
-	new DeviceManager(
-		"HostName=iot-warrior.azure-devices.net;DeviceId=Lamp_Device;SharedAccessKey=et+aBpSlOWW3gZDIwajcw1HHNbXSo7Ss4Q0EYwe0IK0=", lampService);
-
+var device = new DeviceManager(configuration, lampService);
 
 
 
 device.Start();
-
-
-
-
-
-
-
-
