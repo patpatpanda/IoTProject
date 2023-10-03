@@ -17,7 +17,7 @@ namespace AdvancedDevice.Data
 			var builder = new ConfigurationBuilder().AddJsonFile($"appsettings.json", true, true);
 			var config = builder.Build();
 
-			var connectionString = config.GetConnectionString("DefaultConnection");
+			var connectionString = config.GetConnectionString("IoTHubConnectionString");
 
 			return connectionString;
 		}

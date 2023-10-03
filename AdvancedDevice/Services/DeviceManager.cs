@@ -41,17 +41,11 @@ namespace AdvancedDevice.DeviceManager
 
 		public void Start()
 		{
-			string deviceId = "Test_Device"; // Replace with the actual device ID you want to check
+			string deviceId = "Lamp_Device"; 
 			string iotHubConnectionString = "HostName=iot-warrior.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=fUwugjRnWfRPHa5sB+yBDMO7Oqzg7yku6AIoTKh4Z5Q=";
 			string apiBaseUrl = "https://deviceapi20230918091812.azurewebsites.net/api/devices";
 
 			
-
-		
-
-				
-
-
 
 			Task.WhenAll(
 				SetTelemetryIntervalAsync()
@@ -135,14 +129,14 @@ namespace AdvancedDevice.DeviceManager
 		{
 			try
 			{
-				// Hämta och deserialisera JSON-payloaden till TelemetryIntervalPayload
+				
 				var payloadJson = methodRequest.DataAsJson;
 				var payload = JsonConvert.DeserializeObject<TelemetryIntervalPayload>(payloadJson);
 
-				// Uppdatera konfigurationen med det nya telemetry-intervallet
+				
 				Configuration.TelemetryInterval = payload.Interval;
 
-				// Uppdatera Device Twin för att reflektera det nya intervallet
+				
 				await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "telemetryInterval",
 					Configuration.TelemetryInterval);
 
@@ -171,7 +165,7 @@ namespace AdvancedDevice.DeviceManager
 			{
 				if (Configuration.AllowSending)
 				{
-					// Check the lamp state and include it in telemetry data
+					
 					bool lampState = _lampService.IsOn();
 
 					string lampMessage = lampState ? "The lamp is on" : "The lamp is off";
@@ -203,7 +197,7 @@ namespace AdvancedDevice.DeviceManager
 			{
 				if (Configuration.AllowSending)
 				{
-					// Check the lamp state
+					
 					bool lampState = _lampService.IsOn();
 
 					
@@ -213,10 +207,10 @@ namespace AdvancedDevice.DeviceManager
 						IsOn = lampState
 					};
 
-					// Serialize the message to JSON
+				
 					var lampStatusJson = JsonConvert.SerializeObject(lampStatusMessage);
 
-					// Send the lamp status data
+				
 					await SendDataAsync(lampStatusJson);
 				}
 
@@ -235,7 +229,7 @@ namespace AdvancedDevice.DeviceManager
 			{
 				var message = new Message(Encoding.UTF8.GetBytes(dataAsJson));
 				await Configuration.DeviceClient.SendEventAsync(message);
-				//Console.WriteLine($"Message sent at {DateTime.Now} with data {dataAsJson}");
+				
 
 			}
 
@@ -256,7 +250,7 @@ namespace AdvancedDevice.DeviceManager
 					await DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "allowSending",
 						Configuration.AllowSending);
 
-					// Turn on the lamp simulator
+				
 					_lampService.TurnOn();
 
 					return new MethodResponse(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(response)), 200);
@@ -300,7 +294,7 @@ namespace AdvancedDevice.DeviceManager
 				if (userInput == "1")
 				{
 					_lampService.TurnOn();
-					// Uppdatera senaste status i Device Twin
+					
 					DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "lampStatus", "on").Wait();
 
 				}
@@ -308,7 +302,7 @@ namespace AdvancedDevice.DeviceManager
 				{
 
 					_lampService.TurnOff();
-					// Uppdatera senaste status i Device Twin
+					
 					DeviceTwinManager.UpdateReportedTwinAsync(Configuration.DeviceClient, "lampStatus", "off").Wait();
 
 				}
@@ -335,7 +329,7 @@ namespace AdvancedDevice.DeviceManager
 			}
 			catch (DeviceNotFoundException)
 			{
-				// If DeviceNotFoundException is thrown, the device is not registered.
+				
 				return false;
 			}
 			catch (Exception ex)
@@ -357,14 +351,12 @@ namespace AdvancedDevice.DeviceManager
 			{
 				Console.WriteLine($"Device {deviceId} is not registered in Azure IoT Hub.");
 
-				// Register the device
 				bool registrationSuccess = await RegisterDeviceAsync(deviceId, iotHubConnectionString, apiBaseUrl);
 
 				if (registrationSuccess)
 				{
 					Console.WriteLine($"Device {deviceId} was registered successfully.");
-					// Save the connection information locally
-					// SaveConnectionInfoLocally(deviceId, iotHubConnectionString);
+					
 				}
 				else
 				{
@@ -374,7 +366,7 @@ namespace AdvancedDevice.DeviceManager
 		}
 
 
-		// ... The rest of your code ...
+		
 
 		static async Task<bool> RegisterDeviceAsync(string deviceId, string iotHubConnectionString, string apiBaseUrl)
 		{
@@ -385,7 +377,7 @@ namespace AdvancedDevice.DeviceManager
 					var registrationData = new
 					{
 						DeviceId = deviceId,
-						// Add other properties as needed for device registration
+						
 					};
 
 					var jsonContent = JsonConvert.SerializeObject(registrationData);
@@ -394,7 +386,7 @@ namespace AdvancedDevice.DeviceManager
 
 					var response =
 						await httpClient.PostAsync($"{apiBaseUrl}/register",
-							requestContent); // Use the correct API endpoint
+							requestContent); 
 
 					if (response.IsSuccessStatusCode)
 					{
