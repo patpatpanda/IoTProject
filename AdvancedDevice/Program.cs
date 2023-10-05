@@ -16,7 +16,7 @@ var configurationBuilder = new ConfigurationBuilder()
 var configuration = configurationBuilder.Build();
 
 
-var iotHubConnectionString = configuration.GetConnectionString("IoTHubConnectionString");
+//var iotHubConnectionString = configuration.GetConnectionString("IoTHubConnectionString");
 
 var lampService = new LampService();
 
