@@ -32,7 +32,7 @@ internal class DeviceManager
 
 		Configuration.DeviceClient.SetMethodHandlerAsync("SetTelemetryInterval", SetTelemetryIntervalMethod, null).Wait();
 
-		var deviceId = "MrKuk";
+		var deviceId = "LampDevice";
 		var iotHubOwnerConnectionString = _configuration.GetConnectionString("IoTHubOwnerConnectionString");
 		var apiBaseUrl = _configuration["ApiBaseUrl"];
 
