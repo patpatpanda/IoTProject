@@ -16,7 +16,7 @@ namespace AdvancedDevice.Services
 			{
 				isOn = true;
 				Console.Clear();
-				Console.WriteLine("Lamp is now on.");
+				Console.WriteLine("Device is now on.");
 			}
 		}
 
@@ -26,7 +26,7 @@ namespace AdvancedDevice.Services
 			{
 				isOn = false;
 				Console.Clear();
-				Console.WriteLine("Lamp is now off.");
+				Console.WriteLine("Device is now off.");
 			}
 		}
 
